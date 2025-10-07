@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Редактировать рецепт{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h3 class="mb-3">Редактировать рецепт</h3>
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+
+                <div class="mb-3">
+                    {{ form.title.label(class="form-label") }}
+                    {{ form.title(class="form-control") }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.category.label(class="form-label") }}
+                    {{ form.category(class="form-control") }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.description.label(class="form-label") }}
+                    {{ form.description(class="form-control", rows="2") }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.cooking_time.label(class="form-label") }}
+                    {{ form.cooking_time(class="form-control") }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.ingredients.label(class="form-label") }}
+                    {{ form.ingredients(class="form-control", rows="3") }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.instructions.label(class="form-label") }}
+                    {{ form.instructions(class="form-control", rows="5") }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.image.label(class="form-label") }}
+                    {{ form.image(class="form-control") }}
+                    <div class="form-text">Загрузите новую картинку, чтобы заменить текущую.</div>
+                </div>
+
+                <div class="d-grid">
+                    {{ form.submit(class="btn btn-success") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

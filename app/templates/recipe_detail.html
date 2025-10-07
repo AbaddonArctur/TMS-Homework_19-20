@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ recipe.title }} — Рецепты{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    {% if recipe.image_filename %}
+        <img src="{{ url_for('static', filename='uploads/' + recipe.image_filename) }}" class="img-fluid" alt="{{ recipe.title }}">
+    {% endif %}
+    <div class="card-body">
+        <h3>{{ recipe.title }}</h3>
+        <p><strong>Категория:</strong> {{ recipe.category }}</p>
+        <p><strong>Описание:</strong> {{ recipe.description }}</p>
+        <p><strong>Время:</strong> {{ recipe.cooking_time }}</p>
+        <p><strong>Ингредиенты:</strong><br>{{ recipe.ingredients|replace(",", "<br>")|safe }}</p>
+        <p><strong>Инструкция:</strong><br>{{ recipe.instructions | replace('\n', '<br>') | safe }}</p>
+
+        {% if current_user.is_authenticated and recipe.author == current_user %}
+            <a href="{{ url_for('main.edit_recipe', recipe_id=recipe.id) }}" class="btn btn-warning btn-sm">Редактировать</a>
+            <form action="{{ url_for('main.delete_recipe', recipe_id=recipe.id) }}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Удалить рецепт?')">Удалить</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
+<h4>Комментарии</h4>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+        {{ form.text(class="form-control", rows="3") }}
+    </div>
+    <div class="d-grid">
+        {{ form.submit(class="btn btn-success") }}
+    </div>
+</form>
+
+<hr>
+
+{% for c in comments %}
+<div class="mb-3">
+    <p><strong>{{ c.author.username if c.author else "Гость" }}</strong> — {{ c.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+    <p>{{ c.text }}</p>
+
+    {% if current_user.is_authenticated and c.author == current_user %}
+        <form action="{{ url_for('main.delete_comment', comment_id=c.id) }}" method="post" class="d-inline">
+            <button class="btn btn-sm btn-outline-danger">Удалить</button>
+        </form>
+    {% endif %}
+
+    {% for reply in c.replies %}
+    <div class="ms-4 mt-2 p-2 border-start">
+        <p><strong>{{ reply.author.username if reply.author else "Гость" }}</strong> — {{ reply.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+        <p>{{ reply.text }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>Пока нет комментариев.</p>
+{% endfor %}
+{% endblock %}

@@ -15,4 +15,4 @@ dist/
 build/
 *.egg-info/
 
-app.db
+app/static/uploads/*
