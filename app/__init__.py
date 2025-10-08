@@ -1,15 +1,9 @@
 import os
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_login import LoginManager
 from config import Config
 from datetime import datetime
-
-db = SQLAlchemy()
-migrate = Migrate()
-login_manager = LoginManager()
-login_manager.login_view = "main.login"
+from app.extensions import db, migrate, login_manager
+from app.routes import main as main_bp
 
 def create_app():
     app = Flask(__name__)
@@ -25,8 +19,6 @@ def create_app():
     def inject_current_year():
         return {'current_year': datetime.utcnow().year}
 
-    from app.routes import main as main_bp
     app.register_blueprint(main_bp)
 
     return app
-

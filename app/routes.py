@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, current_app
 from flask_login import login_user, logout_user, login_required, current_user
-from app import db
+from app.extensions import db
 from app.models import User, Recipe, Comment
 from app.forms import RegistrationForm, LoginForm, RecipeForm, CommentForm
 from app.utils import allowed_file, save_and_resize_image
@@ -26,11 +26,18 @@ def index():
     if category:
         query = query.filter(Recipe.category.ilike(f"%{category}%"))
 
-    pagination = query.order_by(Recipe.created_at.desc()).paginate(page=page, per_page=per_page)
+    pagination = query.order_by(Recipe.created_at.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
     recipes = pagination.items
 
-    return render_template("index.html", recipes=recipes, pagination=pagination, q=q, category=category)
-
+    return render_template(
+        "index.html",
+        recipes=recipes,
+        pagination=pagination,
+        q=q,
+        category=category
+    )
 
 @main.route("/register", methods=["GET", "POST"])
 def register():
@@ -225,17 +232,3 @@ def delete_comment(comment_id):
 
     flash("Комментарий удалён.", "info")
     return redirect(url_for("main.recipe_detail", recipe_id=recipe_id))
-
-@main.route("/search")
-def search():
-    q = request.args.get("q", "").strip()
-    recipes = []
-
-    if q:
-        recipes = Recipe.query.filter(
-            (Recipe.title.ilike(f"%{q}%")) |
-            (Recipe.ingredients.ilike(f"%{q}%")) |
-            (Recipe.category.ilike(f"%{q}%"))
-        ).order_by(Recipe.created_at.desc()).all()
-
-    return render_template("index.html", recipes=recipes, query=q)
