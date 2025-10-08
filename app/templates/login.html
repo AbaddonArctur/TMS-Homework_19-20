@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-center align-items-center mt-5">
+    <div class="card shadow-sm p-4" style="width: 400px;">
+        <h3 class="text-center mb-4">Вход</h3>
+
+        {# общая ошибка перед формой (передаётся как error в routes) #}
+        {% if error %}
+            <div class="form-text text-danger mb-3">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" novalidate>
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+                {{ form.username.label(class="form-label") }}
+                {{ form.username(class="form-control") }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.password.label(class="form-label") }}
+                {{ form.password(class="form-control") }}
+            </div>
+
+            <div class="d-grid">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+
+        <div class="text-center mt-3">
+            <small>Нет аккаунта? <a href="{{ url_for('main.register') }}">Зарегистрироваться</a></small>
+        </div>
+    </div>
+</div>
+{% endblock %}

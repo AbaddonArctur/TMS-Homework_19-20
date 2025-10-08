@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Главная — Рецепты{% endblock %}
+
+{% block content %}
+<h2>Все рецепты</h2>
+
+<form class="d-flex mb-4" action="{{ url_for('main.index') }}" method="get">
+    <input class="form-control me-2" type="search" name="q" placeholder="Поиск по названию, категории или ингредиентам" value="{{ query if query else '' }}">
+    <button class="btn btn-outline-success" type="submit">Поиск</button>
+    {% if q %}
+        <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary">Очистить</a>
+    {% endif %}
+</form>
+
+{% if recipes %}
+    <div class="row">
+        {% for recipe in recipes %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    {% if recipe.image_filename %}
+                        <img src="{{ url_for('static', filename='uploads/' + recipe.image_filename) }}"
+                             class="card-img-top"
+                             alt="{{ recipe.title }}">
+                    {% else %}
+                        <div class="card-img-top no-image">Нет изображения</div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ recipe.title }}</h5>
+                        <p class="card-text text-muted small mb-1">{{ recipe.category }}</p>
+                        <p class="card-text">{{ recipe.description|truncate(100, True) }}</p>
+                        <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}"
+                           class="btn btn-outline-success btn-sm">
+                           Смотреть рецепт
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-secondary text-center" role="alert">
+        По вашему запросу ничего не найдено 😔
+    </div>
+{% endif %}
+
+{% if pagination and pagination.pages > 1 %}
+<nav aria-label="Навигация по страницам">
+  <ul class="pagination justify-content-center mt-4">
+    {% if pagination.has_prev %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('main.index', page=pagination.prev_num, q=q, category=category) }}">Назад</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Назад</span></li>
+    {% endif %}
+
+    {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+      {% if p %}
+        {% if p == pagination.page %}
+          <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+        {% else %}
+          <li class="page-item"><a class="page-link" href="{{ url_for('main.index', page=p, q=q, category=category) }}">{{ p }}</a></li>
+        {% endif %}
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">…</span></li>
+      {% endif %}
+    {% endfor %}
+
+    {% if pagination.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('main.index', page=pagination.next_num, q=q, category=category) }}">Вперёд</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Вперёд</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}
